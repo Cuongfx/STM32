@@ -54,6 +54,55 @@ A laptop speaks USB; an STM32 speaks UART. The CH340G converts between them and 
 
 UART is **asynchronous**: there is no clock wire. Each side runs its own timer and both must be told the same speed in advance — here `115200` baud, 8 data bits, no parity, 1 stop bit (`8N1`). If the two sides disagree by more than roughly 2–3%, the receiver samples at the wrong instants and you get garbage characters rather than an error. (Wrong baud rate is also the most common reason for "nothing happens": a terminal left at `9600` will not understand a board talking at `115200`.)
 
+### Two devices, three wires
+
+![Two microcontrollers connected by UART: Tx to Rx, Rx to Tx, shared GND](diagrams/uart_connection.svg)
+
+Every UART device has a **Tx** pin (where it *talks*) and an **Rx** pin (where it *listens*). Two devices are connected by crossing them over:
+
+- **Tx → Rx.** What one side transmits, the other side receives. Wiring Tx to Tx would put two talkers on one wire and leave nobody listening.
+- **Rx ← Tx.** The return path is a *second*, separate wire. Because each direction has its own wire, both sides can talk at the same time (**full duplex**).
+- **GND — GND.** A logic level is a voltage *relative to something*; the shared ground is that something.
+
+There is no clock wire and no "chip select" wire, which is why the link needs so few pins. It is also why UART connects exactly **two** devices: there is no way to address a third.
+
+In this project the Nucleo is one MCU (`PA9` = Tx, `PA10` = Rx) and the CH340G module plays the other; the module in turn talks to the PC over USB.
+
+### The frame: start, data, stop
+
+![UART frame format: start bit, eight data bits D0 to D7, optional parity bit, stop bit](diagrams/uart_frame_format.svg)
+
+Bytes do not travel alone. Each one is wrapped in a **frame** so the receiver can tell where it begins and ends without a clock:
+
+| Field | Level | Purpose |
+|---|---|---|
+| **Idle** | HIGH | The resting state of the line between frames |
+| **Start bit** | LOW (logic 0) | The falling edge announces "a byte begins now" and starts the receiver's timer |
+| **D0 … D7** | data | The eight bits of the byte, **least-significant bit first** |
+| **Parity bit** (PB) | even / odd | *Optional.* One extra bit that makes the number of 1s even (or odd), so a single flipped bit can be detected. Not used here |
+| **Stop bit** | HIGH (logic 1) | Returns the line to idle, and guarantees that the next start bit is a fresh falling edge |
+
+The setting used here is **8N1**: 8 data bits, No parity, 1 stop bit. That is 1 + 8 + 1 = **10 bits on the wire for every byte of data**, so at most 80% of the line speed carries real data.
+
+The **baud rate** is the number of bits per second, and it fixes how long each cell in the diagram lasts. At 115200 baud one bit lasts 1 / 115200 ≈ 8.7µs, so a frame takes about 87µs and the link moves roughly 11,500 bytes per second. Because there is no clock wire, the receiver times every bit with its own timer, started by the falling edge of the start bit and aimed at the *middle* of each bit (the STM32 takes three samples around the middle and votes). That is why both sides must be set to the same baud rate in advance.
+
+### Worked example: sending 0x93
+
+![The byte 0x93 sent as a UART waveform from TX to RX](diagrams/uart_byte_0x93.svg)
+
+To send one byte, say `0x93`:
+
+1. Write it in binary: `0x93` = `1001 0011`.
+2. Reverse the order, because the **least-significant bit goes first**: `1 1 0 0 1 0 0 1`.
+3. Put the start bit in front and the stop bit behind:
+
+```
+idle   start   D0 D1 D2 D3 D4 D5 D6 D7   stop   idle
+ 1       0      1  1  0  0  1  0  0  1     1      1
+```
+
+The receiver does the same in reverse: it waits for the line to fall, samples the eight bits in turn, stacks them with the first one in the lowest position, checks that the stop bit is HIGH, and ends up with `1001 0011` = `0x93` again. When you read a waveform on an oscilloscope or logic analyser, remember that left to right gives the binary number **backwards**.
+
 ### A keystroke is a number
 
 The PC does not send the *letter* `a`. It sends the number **97**, and the terminal on the other end agrees to draw 97 as `a`. That agreement is the ASCII table:
@@ -66,15 +115,15 @@ The PC does not send the *letter* `a`. It sends the number **97**, and the termi
 
 In C, `'a'` is simply another way to write `97`. So `case 'a':` in the firmware is a comparison between the received byte and the number 97, and `default:` catches every other number from 0 to 255.
 
-### One byte on the wire
+### One keystroke on the wire
 
-With no clock wire, the line itself carries the framing. It idles HIGH; a **start bit** pulls it LOW to announce a byte; eight **data bits** follow, **least-significant bit first**; a **stop bit** returns the line HIGH.
+Apply the worked example above to the letter this project sends most: `a`.
 
 ![One UART frame carrying the letter 'a' (0x61), and the instant the RXNE flag is raised](uart_frame_diagram.svg)
 
 Note the order of the bits: `0x61` is `0110 0001`, but it travels as `1 0 0 0 0 1 1 0` because the lowest bit goes first.
 
-At 115200 baud one bit lasts 1 / 115200 ≈ 8.7µs, so a whole frame (1 start + 8 data + 1 stop = 10 bits) takes about **87µs**. For that whole time the CPU is **not involved**: the USART1 peripheral shifts the bits in by itself. Only when the stop bit ends does the finished byte land in the data register `DR` and the hardware raise the `RXNE` flag. That single instant is what everything in this project hangs off.
+A whole frame takes about **87µs** at 115200 baud. For that whole time the CPU is **not involved**: the USART1 peripheral shifts the bits in by itself. Only when the stop bit ends does the finished byte land in the data register `DR` and the hardware raise the `RXNE` flag. That single instant is what everything in this project hangs off.
 
 ### From the flag to your function
 
@@ -353,7 +402,8 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 ├── README.md                          - this file
 ├── wiring_diagram.svg                 - how to wire the CH340G to the Nucleo
 ├── uart_frame_diagram.svg             - the letter 'a' as one UART frame
-└── command_flow_diagram.svg           - keystroke → interrupt → flag → main loop → LED
+├── command_flow_diagram.svg           - keystroke → interrupt → flag → main loop → LED
+└── diagrams/                          - UART basics: uart_connection, uart_frame_format, uart_byte_0x93 (.svg + .png)
 ```
 
 ## Where this goes next

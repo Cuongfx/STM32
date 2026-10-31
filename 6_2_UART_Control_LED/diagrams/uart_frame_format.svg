@@ -1,0 +1,50 @@
+<svg width="860" height="290" viewBox="0 0 860 290" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>UART frame format</title>
+<desc>One UART frame: a start bit (logic 0), eight data bits D0 to D7, an optional parity bit, and a stop bit (logic 1). Below the frame, a pulse is drawn in each bit slot.</desc>
+<rect width="860" height="290" fill="#ffffff"/>
+
+<!-- labels above -->
+<text x="75" y="38" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">Start bit</text>
+<text x="75" y="55" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">logic 0</text>
+
+<text x="390" y="50" text-anchor="middle" font-family="sans-serif" font-size="17" font-weight="700" fill="#1a1a1a">Data to transmit</text>
+<path d="M115 90 L115 74 L665 74 L665 90" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+
+<text x="705" y="38" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">Parity bit</text>
+<text x="705" y="55" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">(optional)</text>
+
+<text x="775" y="38" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">Stop bit</text>
+<text x="775" y="55" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">logic 1</text>
+
+<!-- frame cells -->
+<rect x="40" y="92" width="70" height="50" fill="#777777" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="75" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#ffffff">START</text>
+
+<rect x="110" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="180" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="250" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="320" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="390" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="460" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="530" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="600" y="92" width="70" height="50" fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="145" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D0</text>
+<text x="215" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D1</text>
+<text x="285" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D2</text>
+<text x="355" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D3</text>
+<text x="425" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D4</text>
+<text x="495" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D5</text>
+<text x="565" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D6</text>
+<text x="635" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">D7</text>
+
+<rect x="670" y="92" width="70" height="50" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="1.5" stroke-dasharray="5 3"/>
+<text x="705" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1a1a1a">PB</text>
+
+<rect x="740" y="92" width="70" height="50" fill="#777777" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="775" y="123" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#ffffff">STOP</text>
+
+<!-- pulses, one per bit slot -->
+<polyline points="40,235 40,180 70,180 70,235 110,235 110,180 140,180 140,235 180,235 180,180 210,180 210,235 250,235 250,180 280,180 280,235 320,235 320,180 350,180 350,235 390,235 390,180 420,180 420,235 460,235 460,180 490,180 490,235 530,235 530,180 560,180 560,235 600,235 600,180 630,180 630,235 670,235 670,180 700,180 700,235 740,235 740,180 770,180 770,235 810,235" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="miter"/>
+
+<text x="425" y="272" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555555">Each cell lasts one bit time (1 / baud rate). The parity bit is optional and is omitted in 8N1.</text>
+</svg>

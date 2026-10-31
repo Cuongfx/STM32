@@ -55,7 +55,58 @@ Equivalent modules — PL2303, CP2102, FT232 — work identically; only the driv
 
 UART is **asynchronous**: there is no clock wire. Each side runs its own timer and both must be told the same baud rate in advance — here `115200`, 8 data bits, no parity, 1 stop bit (`8N1`). If the two disagree by more than roughly 2–3%, the receiver samples at the wrong instants and you get garbage characters rather than an error.
 
-With no clock to mark where a byte begins, the line itself carries the framing. It idles HIGH; a **start bit** pulls it LOW to announce that data is coming; eight **data bits** follow, least-significant bit first; a **stop bit** returns the line HIGH.
+### Two devices, three wires
+
+![Two microcontrollers connected by UART: Tx to Rx, Rx to Tx, shared GND](diagrams/uart_connection.svg)
+
+Every UART device has a **Tx** pin (where it *talks*) and an **Rx** pin (where it *listens*). Two devices are connected by crossing them over:
+
+- **Tx → Rx.** What one side transmits, the other side receives. Wiring Tx to Tx would put two talkers on one wire and leave nobody listening.
+- **Rx ← Tx.** The return path is a *second*, separate wire. Because each direction has its own wire, both sides can talk at the same time (**full duplex**) — which is exactly what this project does: the board counts out while it listens for `s` and `r`.
+- **GND — GND.** A logic level is a voltage *relative to something*; the shared ground is that something.
+
+There is no clock wire and no "chip select" wire, which is why the link needs so few pins. It is also why UART connects exactly **two** devices: there is no way to address a third.
+
+In this project the Nucleo is one MCU (`PA9` = Tx, `PA10` = Rx) and the CH340G module plays the other; the module in turn talks to the PC over USB.
+
+### The frame: start, data, stop
+
+![UART frame format: start bit, eight data bits D0 to D7, optional parity bit, stop bit](diagrams/uart_frame_format.svg)
+
+Bytes do not travel alone. Each one is wrapped in a **frame** so the receiver can tell where it begins and ends without a clock:
+
+| Field | Level | Purpose |
+|---|---|---|
+| **Idle** | HIGH | The resting state of the line between frames |
+| **Start bit** | LOW (logic 0) | The falling edge announces "a byte begins now" and starts the receiver's timer |
+| **D0 … D7** | data | The eight bits of the byte, **least-significant bit first** |
+| **Parity bit** (PB) | even / odd | *Optional.* One extra bit that makes the number of 1s even (or odd), so a single flipped bit can be detected. Not used here |
+| **Stop bit** | HIGH (logic 1) | Returns the line to idle, and guarantees that the next start bit is a fresh falling edge |
+
+The setting used here is **8N1**: 8 data bits, No parity, 1 stop bit. That is 1 + 8 + 1 = **10 bits on the wire for every byte of data**, so at most 80% of the line speed carries real data.
+
+The **baud rate** is the number of bits per second, and it fixes how long each cell in the diagram lasts. At 115200 baud one bit lasts 1 / 115200 ≈ 8.7µs, so a frame takes about 87µs and the link moves roughly 11,500 bytes per second. Because there is no clock wire, the receiver times every bit with its own timer, started by the falling edge of the start bit and aimed at the *middle* of each bit (the STM32 takes three samples around the middle and votes). That is why both sides must be set to the same baud rate in advance.
+
+### Worked example: sending 0x93
+
+![The byte 0x93 sent as a UART waveform from TX to RX](diagrams/uart_byte_0x93.svg)
+
+To send one byte, say `0x93`:
+
+1. Write it in binary: `0x93` = `1001 0011`.
+2. Reverse the order, because the **least-significant bit goes first**: `1 1 0 0 1 0 0 1`.
+3. Put the start bit in front and the stop bit behind:
+
+```
+idle   start   D0 D1 D2 D3 D4 D5 D6 D7   stop   idle
+ 1       0      1  1  0  0  1  0  0  1     1      1
+```
+
+The receiver does the same in reverse: it waits for the line to fall, samples the eight bits in turn, stacks them with the first one in the lowest position, checks that the stop bit is HIGH, and ends up with `1001 0011` = `0x93` again. When you read a waveform on an oscilloscope or logic analyser, remember that left to right gives the binary number **backwards**.
+
+### What the receiver does, and when the CPU finds out
+
+The next diagram shows the same `0x93` frame from the receiver's side: what the hardware does while the bits arrive, and the one instant at which the CPU is told.
 
 ![One UART frame carrying 0x93, and the instant the RXNE flag is raised](uart_frame_diagram.svg)
 
@@ -274,7 +325,8 @@ The `HEX` checkbox beside the Send field stays unticked. No line terminator is n
 ├── wiring_diagram.svg                 - how to wire the CH340G to the Nucleo
 ├── uart_frame_diagram.svg             - one UART frame, and where the interrupt comes from
 ├── polling_vs_interrupt_diagram.svg   - why reception cannot be blocking
-└── interrupt_chain_diagram.svg        - RXNE flag → NVIC → vector table → callback
+├── interrupt_chain_diagram.svg        - RXNE flag → NVIC → vector table → callback
+└── diagrams/                          - UART basics: uart_connection, uart_frame_format, uart_byte_0x93 (.svg)
 ```
 
 ## Where this goes next

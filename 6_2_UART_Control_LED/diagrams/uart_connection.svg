@@ -1,0 +1,36 @@
+<svg width="700" height="300" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>UART connection between two microcontrollers</title>
+<desc>Two microcontrollers are connected by three wires. UART Tx of MCU1 goes to UART Rx of MCU2, UART Tx of MCU2 goes to UART Rx of MCU1, and the two GND pins are joined and tied to ground.</desc>
+<rect width="700" height="300" fill="#ffffff"/>
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M1 1L9 5L1 9Z" fill="#1a1a1a"/>
+  </marker>
+</defs>
+
+<text x="150" y="40" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#1a1a1a">MCU1</text>
+<text x="550" y="40" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#1a1a1a">MCU2</text>
+
+<rect x="40" y="50" width="220" height="170" fill="#f9bfa6" stroke="#333333" stroke-width="1.5"/>
+<rect x="440" y="50" width="220" height="170" fill="#f9bfa6" stroke="#333333" stroke-width="1.5"/>
+
+<text x="245" y="97" text-anchor="end" font-family="sans-serif" font-size="16" fill="#1a1a1a">UART Tx</text>
+<text x="245" y="137" text-anchor="end" font-family="sans-serif" font-size="16" fill="#1a1a1a">UART Rx</text>
+<text x="245" y="177" text-anchor="end" font-family="sans-serif" font-size="16" fill="#1a1a1a">GND</text>
+
+<text x="455" y="97" font-family="sans-serif" font-size="16" fill="#1a1a1a">UART Rx</text>
+<text x="455" y="137" font-family="sans-serif" font-size="16" fill="#1a1a1a">UART Tx</text>
+<text x="455" y="177" font-family="sans-serif" font-size="16" fill="#1a1a1a">GND</text>
+
+<line x1="260" y1="90" x2="440" y2="90" stroke="#1a1a1a" stroke-width="2" marker-end="url(#a)"/>
+<line x1="440" y1="130" x2="260" y2="130" stroke="#1a1a1a" stroke-width="2" marker-end="url(#a)"/>
+<line x1="260" y1="170" x2="440" y2="170" stroke="#1a1a1a" stroke-width="2"/>
+
+<circle cx="350" cy="170" r="4.5" fill="#1a1a1a"/>
+<line x1="350" y1="170" x2="350" y2="232" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="326" y1="232" x2="374" y2="232" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="334" y1="240" x2="366" y2="240" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="342" y1="248" x2="358" y2="248" stroke="#1a1a1a" stroke-width="2"/>
+
+<text x="350" y="285" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555555">Tx of one side goes to Rx of the other. The grounds are shared.</text>
+</svg>
