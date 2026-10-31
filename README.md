@@ -13,15 +13,15 @@ Each project is self-contained: its own STM32CubeIDE project (`.project`/`.cproj
 
 | # | Project | Teaches |
 |---|---|---|
-| 1 | [1_Blink_LED](1_Blink_LED) | Non-blocking timing with `HAL_GetTick()` — two LEDs blinking at independent rates without `HAL_Delay()` blocking either one |
-| 2 | [2_Button](2_Button) | Polling a button: mechanical debounce, single click, double click, long-press — all as a non-blocking state machine |
-| 3.1 | [3_1_Button_Interupt](3_1_Button_Interupt) | Same button logic, but edge-detected via **EXTI interrupt**, restructured into a modular `lib/` with a reusable interrupt dispatcher (for when more than one interrupt source is needed) |
-| 3.2 | [3_2_Button_Interrupt](3_2_Button_Interrupt) | Same interrupt-driven button logic, built **step by step in a single file** — the recommended path for walking a student through the reasoning, stage by stage, before showing them the modular version in 3.1 |
-| 4.1 | [4_1_ADC_LED](4_1_ADC_LED) | True single-channel ADC read from a potentiometer, driving an LED's brightness through timer PWM |
-| 4.2 | [4_2_Multi_ADC_LED](4_2_Multi_ADC_LED) | True multi-channel ADC using **hardware scan mode + DMA** — a potentiometer and an LDR read on the same ADC simultaneously, each driving its own LED's brightness independently |
-| 5 | [5_Timer_Interrupt](5_Timer_Interrupt) | HC-SR04 ultrasonic distance sensor driving LED brightness — a **free-running timer (TIM3)** shared between `delay_us()` and Echo pulse timestamping, a **60ms Update interrupt (TIM6)** scheduling each ranging cycle, and **TIM4 PWM** for brightness; sensor logic isolated in its own `lib/sensor.c` |
-| 6.1 | [6_1_UART_HELLO_WORLD](6_1_UART_HELLO_WORLD) | Talking to a PC over **UART** through a CH340G USB-to-serial bridge — blocking `HAL_UART_Transmit()` for output, **interrupt-driven receive** (`HAL_UART_Receive_IT` + `HAL_UART_RxCpltCallback`) for input, and a `volatile` flag that lets typed commands pause and resume the counting loop without ever blocking it |
-| 6.2 | [6_2_UART_Control_LED](6_2_UART_Control_LED) | Controlling the on-board LED from the keyboard over **UART** — `a` turns it on, `b` turns it off, anything else gets a warning. The same interrupt-driven receive as 6.1, but packaged as a reusable **`uart_led` library** where the interrupt only leaves a `volatile` flag and a one-byte mailbox, and the main loop does the switching and replies |
+| 1 | [1_Blink_LED](1_Blink_LED) | Non-blocking timing: blink two LEDs at different rates using `HAL_GetTick()` instead of `HAL_Delay()` |
+| 2 | [2_Button](2_Button) | Reading a button by polling: debounce, single click, double click and long press |
+| 3.1 | [3_1_Button_Interupt](3_1_Button_Interupt) | Reading a button with an **EXTI interrupt**, organised as a reusable `lib/` module |
+| 3.2 | [3_2_Button_Interrupt](3_2_Button_Interrupt) | The same interrupt-driven button, built step by step in a single file (easier to follow than 3.1) |
+| 4.1 | [4_1_ADC_LED](4_1_ADC_LED) | Reading a potentiometer with the **ADC** and using it to set LED brightness with **PWM** |
+| 4.2 | [4_2_Multi_ADC_LED](4_2_Multi_ADC_LED) | Reading several analog inputs (potentiometer and LDR) at once with the **ADC + DMA** |
+| 5 | [5_Timer_Interrupt](5_Timer_Interrupt) | Using **timers and timer interrupts** to read an HC-SR04 distance sensor and drive an LED |
+| 6.1 | [6_1_UART_HELLO_WORLD](6_1_UART_HELLO_WORLD) | **UART** basics: send and receive data between the board and a PC through a CH340G module |
+| 6.2 | [6_2_UART_Control_LED](6_2_UART_Control_LED) | Controlling an LED from the PC over **UART**, with the UART code organised as a small library |
 
 ## Folder structure (general)
 
