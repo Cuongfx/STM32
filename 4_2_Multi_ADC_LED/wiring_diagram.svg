@@ -1,102 +1,85 @@
-<svg width="1000" height="620" viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" role="img">
+<svg width="660" height="640" viewBox="0 0 660 640" xmlns="http://www.w3.org/2000/svg" role="img">
 <title>Wiring diagram for the multi-channel ADC scan + DMA project</title>
-<desc>Nucleo-F446RE with a potentiometer wiper on PA0 and an LDR voltage divider midpoint on PA1 as ADC inputs, and two LEDs with series resistors on PA6 and PA7 as PWM outputs driven by TIM3.</desc>
-<rect width="1000" height="620" fill="#ffffff"/>
+<desc>Nucleo-F446RE with a potentiometer wiper on PA0 and an LDR voltage divider midpoint on PA1 as ADC inputs, and two LEDs with series resistors on PA6 and PA7 as PWM outputs driven by TIM3. Each of the four parts is drawn as its own row with its own 3V3 and GND symbols so that no wires cross.</desc>
+<rect width="660" height="640" fill="#ffffff"/>
 
-<rect x="30" y="40" width="220" height="520" rx="10" fill="#f5f5f2" stroke="#1a1a1a" stroke-width="1.5"/>
-<text x="140" y="70" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#1a1a1a">Nucleo-F446RE</text>
+<!-- Nucleo -->
+<rect x="30" y="30" width="200" height="580" rx="10" fill="#f5f5f2" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="130" y="58" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#1a1a1a">Nucleo-F446RE</text>
 
-<!-- Single 3V3 source, split into a rail feeding both branches -->
-<line x1="250" y1="150" x2="350" y2="150" stroke="#1a1a1a" stroke-width="2"/>
-<text x="255" y="140" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">3V3</text>
-<line x1="350" y1="90" x2="350" y2="300" stroke="#1a1a1a" stroke-width="2"/>
-<circle cx="350" cy="150" r="4" fill="#1a1a1a"/>
-<circle cx="350" cy="90" r="4" fill="#1a1a1a"/>
-<circle cx="350" cy="300" r="4" fill="#1a1a1a"/>
-
-<!-- Potentiometer branch (PA0) -->
-<line x1="350" y1="90" x2="430" y2="90" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="430" y1="90" x2="430" y2="140" stroke="#1a1a1a" stroke-width="2"/>
-
-<text x="430" y="113" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">10kΩ potentiometer</text>
-<text x="430" y="129" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">(linear, B103)</text>
-
-<rect x="410" y="140" width="40" height="90" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-
-<line x1="250" y1="185" x2="406" y2="185" stroke="#1a1a1a" stroke-width="2"/>
-<polygon points="410,185 396,179 396,191" fill="#1a1a1a"/>
-<text x="255" y="172" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA0 (A0)</text>
-<text x="255" y="205" font-family="sans-serif" font-size="11" fill="#555555">wiper — ADC1_IN0</text>
-
-<line x1="430" y1="230" x2="430" y2="250" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="430" y1="250" x2="700" y2="250" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="700" y1="250" x2="700" y2="560" stroke="#1a1a1a" stroke-width="2"/>
-
-<!-- LDR divider branch (PA1) -->
-<line x1="350" y1="300" x2="430" y2="300" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="430" y1="300" x2="430" y2="330" stroke="#1a1a1a" stroke-width="2"/>
-
-<rect x="410" y="330" width="40" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-<text x="460" y="364" font-family="sans-serif" font-size="12" fill="#1a1a1a">LDR (light sensor)</text>
-
-<line x1="430" y1="390" x2="430" y2="430" stroke="#1a1a1a" stroke-width="2"/>
-<circle cx="430" cy="430" r="4" fill="#1a1a1a"/>
-
-<line x1="250" y1="430" x2="412" y2="430" stroke="#1a1a1a" stroke-width="2"/>
-<polygon points="426,430 412,424 412,436" fill="#1a1a1a"/>
-<text x="255" y="417" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA1 (A1)</text>
-<text x="255" y="450" font-family="sans-serif" font-size="11" fill="#555555">midpoint — ADC1_IN1</text>
-
-<line x1="430" y1="430" x2="430" y2="470" stroke="#1a1a1a" stroke-width="2"/>
-
-<rect x="410" y="470" width="40" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-<text x="460" y="504" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 10kΩ</text>
-
-<line x1="430" y1="530" x2="430" y2="560" stroke="#1a1a1a" stroke-width="2"/>
-
-<!-- LED1 branch (PA6) -->
-<text x="560" y="80" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA6 (D12)</text>
-<text x="560" y="105" font-family="sans-serif" font-size="11" fill="#555555">TIM3_CH1 PWM</text>
-<line x1="620" y1="90" x2="680" y2="90" stroke="#1a1a1a" stroke-width="2"/>
-
-<text x="710" y="75" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
-<rect x="680" y="80" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-
-<line x1="740" y1="90" x2="780" y2="90" stroke="#1a1a1a" stroke-width="2"/>
-<g>
-<polygon points="780,76 780,104 808,90" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
-<line x1="808" y1="76" x2="808" y2="104" stroke="#8a5a00" stroke-width="2"/>
+<g font-family="sans-serif" text-anchor="end">
+  <text x="218" y="111" font-size="13" font-weight="700" fill="#1a1a1a">PA0 (A0)</text>
+  <text x="218" y="128" font-size="11" fill="#555555">ADC1_IN0 · wiper</text>
+  <text x="218" y="336" font-size="13" font-weight="700" fill="#1a1a1a">PA1 (A1)</text>
+  <text x="218" y="353" font-size="11" fill="#555555">ADC1_IN1 · divider midpoint</text>
+  <text x="218" y="496" font-size="13" font-weight="700" fill="#1a1a1a">PA6 (D12)</text>
+  <text x="218" y="513" font-size="11" fill="#555555">TIM3_CH1 PWM</text>
+  <text x="218" y="556" font-size="13" font-weight="700" fill="#1a1a1a">PA7 (D11)</text>
+  <text x="218" y="573" font-size="11" fill="#555555">TIM3_CH2 PWM</text>
 </g>
-<text x="794" y="126" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">LED1</text>
 
-<line x1="808" y1="90" x2="950" y2="90" stroke="#1a1a1a" stroke-width="2"/>
+<!-- Row 1: potentiometer (PA0) -->
+<text x="380" y="38" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#c0392b">3V3</text>
+<line x1="366" y1="46" x2="394" y2="46" stroke="#c0392b" stroke-width="2.5"/>
+<line x1="380" y1="46" x2="380" y2="70" stroke="#c0392b" stroke-width="2.5"/>
+<rect x="360" y="70" width="40" height="90" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="230" y1="115" x2="344" y2="115" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="358,115 344,109 344,121" fill="#2f6fed"/>
+<line x1="380" y1="160" x2="380" y2="180" stroke="#555555" stroke-width="2.5"/>
+<line x1="366" y1="180" x2="394" y2="180" stroke="#555555" stroke-width="2.5"/>
+<line x1="372" y1="188" x2="388" y2="188" stroke="#555555" stroke-width="2"/>
+<line x1="377" y1="196" x2="383" y2="196" stroke="#555555" stroke-width="1.5"/>
+<text x="420" y="111" font-family="sans-serif" font-size="12" fill="#1a1a1a">10kΩ potentiometer</text>
+<text x="420" y="128" font-family="sans-serif" font-size="11" fill="#555555">(linear, B103)</text>
 
-<!-- LED2 branch (PA7) -->
-<text x="560" y="170" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA7 (D11)</text>
-<text x="560" y="195" font-family="sans-serif" font-size="11" fill="#555555">TIM3_CH2 PWM</text>
-<line x1="620" y1="180" x2="680" y2="180" stroke="#1a1a1a" stroke-width="2"/>
+<!-- Row 2: LDR divider (PA1) -->
+<text x="380" y="218" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#c0392b">3V3</text>
+<line x1="366" y1="226" x2="394" y2="226" stroke="#c0392b" stroke-width="2.5"/>
+<line x1="380" y1="226" x2="380" y2="246" stroke="#c0392b" stroke-width="2.5"/>
+<rect x="360" y="246" width="40" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="380" y1="306" x2="380" y2="360" stroke="#1a1a1a" stroke-width="2.5"/>
+<circle cx="380" cy="340" r="4.5" fill="#2f6fed"/>
+<line x1="230" y1="340" x2="362" y2="340" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="374,340 360,334 360,346" fill="#2f6fed"/>
+<rect x="360" y="360" width="40" height="60" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<line x1="380" y1="420" x2="380" y2="440" stroke="#555555" stroke-width="2.5"/>
+<line x1="366" y1="440" x2="394" y2="440" stroke="#555555" stroke-width="2.5"/>
+<line x1="372" y1="448" x2="388" y2="448" stroke="#555555" stroke-width="2"/>
+<line x1="377" y1="456" x2="383" y2="456" stroke="#555555" stroke-width="1.5"/>
+<text x="420" y="280" font-family="sans-serif" font-size="12" fill="#1a1a1a">LDR (light sensor)</text>
+<text x="420" y="394" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 10kΩ</text>
 
-<text x="710" y="165" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
-<rect x="680" y="170" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<!-- Row 3: LED1 (PA6) -->
+<line x1="230" y1="500" x2="300" y2="500" stroke="#2f6fed" stroke-width="2.5"/>
+<rect x="300" y="490" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<text x="330" y="482" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
+<line x1="360" y1="500" x2="420" y2="500" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="420,486 420,514 448,500" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="448" y1="486" x2="448" y2="514" stroke="#8a5a00" stroke-width="2"/>
+<line x1="452" y1="490" x2="460" y2="482" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="452" y1="498" x2="460" y2="490" stroke="#8a5a00" stroke-width="1.5"/>
+<text x="434" y="478" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#1a1a1a">LED1</text>
+<line x1="448" y1="500" x2="520" y2="500" stroke="#555555" stroke-width="2.5"/>
+<line x1="520" y1="500" x2="520" y2="520" stroke="#555555" stroke-width="2.5"/>
+<line x1="506" y1="520" x2="534" y2="520" stroke="#555555" stroke-width="2.5"/>
+<line x1="512" y1="528" x2="528" y2="528" stroke="#555555" stroke-width="2"/>
+<line x1="517" y1="536" x2="523" y2="536" stroke="#555555" stroke-width="1.5"/>
 
-<line x1="740" y1="180" x2="780" y2="180" stroke="#1a1a1a" stroke-width="2"/>
-<g>
-<polygon points="780,166 780,194 808,180" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
-<line x1="808" y1="166" x2="808" y2="194" stroke="#8a5a00" stroke-width="2"/>
-</g>
-<text x="794" y="216" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">LED2</text>
+<!-- Row 4: LED2 (PA7) -->
+<line x1="230" y1="560" x2="300" y2="560" stroke="#2f6fed" stroke-width="2.5"/>
+<rect x="300" y="550" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<text x="330" y="542" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
+<line x1="360" y1="560" x2="420" y2="560" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="420,546 420,574 448,560" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="448" y1="546" x2="448" y2="574" stroke="#8a5a00" stroke-width="2"/>
+<line x1="452" y1="550" x2="460" y2="542" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="452" y1="558" x2="460" y2="550" stroke="#8a5a00" stroke-width="1.5"/>
+<text x="434" y="538" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#1a1a1a">LED2</text>
+<line x1="448" y1="560" x2="520" y2="560" stroke="#555555" stroke-width="2.5"/>
+<line x1="520" y1="560" x2="520" y2="580" stroke="#555555" stroke-width="2.5"/>
+<line x1="506" y1="580" x2="534" y2="580" stroke="#555555" stroke-width="2.5"/>
+<line x1="512" y1="588" x2="528" y2="588" stroke="#555555" stroke-width="2"/>
+<line x1="517" y1="596" x2="523" y2="596" stroke="#555555" stroke-width="1.5"/>
 
-<line x1="808" y1="180" x2="950" y2="180" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="950" y1="90" x2="950" y2="560" stroke="#1a1a1a" stroke-width="2"/>
-
-<!-- shared GND bus -->
-<line x1="430" y1="560" x2="950" y2="560" stroke="#1a1a1a" stroke-width="2"/>
-<circle cx="430" cy="560" r="4" fill="#1a1a1a"/>
-<circle cx="700" cy="560" r="4" fill="#1a1a1a"/>
-<circle cx="950" cy="560" r="4" fill="#1a1a1a"/>
-
-<line x1="680" y1="560" x2="720" y2="560" stroke="#1a1a1a" stroke-width="2.5"/>
-<line x1="688" y1="568" x2="712" y2="568" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="695" y1="576" x2="705" y2="576" stroke="#1a1a1a" stroke-width="1.5"/>
-<text x="700" y="598" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">GND</text>
+<text x="30" y="628" font-family="sans-serif" font-size="12" fill="#555555">Every 3V3 and GND symbol goes to the same 3V3 or GND pin of the Nucleo (use the breadboard power rails).</text>
 </svg>

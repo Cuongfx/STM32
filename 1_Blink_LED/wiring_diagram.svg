@@ -11,7 +11,7 @@
 <text x="140" y="346" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">PA5 - no wiring needed</text>
 
 <line x1="240" y1="160" x2="300" y2="160" stroke="#1a1a1a" stroke-width="2"/>
-<text x="245" y="150" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA1</text>
+<text x="245" y="180" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA1 (A1)</text>
 
 <rect x="300" y="150" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
 <text x="330" y="145" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>

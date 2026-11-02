@@ -1,61 +1,57 @@
-<svg width="700" height="480" viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg" role="img">
+<svg width="700" height="470" viewBox="0 0 700 470" xmlns="http://www.w3.org/2000/svg" role="img">
 <title>Wiring diagram for the ADC single-channel + PWM LED project</title>
-<desc>Nucleo-F446RE with a 10k potentiometer wiper on PA0 (ADC1_IN0) for input, and an LED with series resistor on PA1 (TIM2_CH2 PWM output) for output. PA1 goes through the resistor, through the LED, and only then to GND.</desc>
-<rect width="700" height="480" fill="#ffffff"/>
+<desc>Nucleo-F446RE with a 10k potentiometer between 3V3 and GND whose wiper goes to PA0 (ADC1_IN0), and an LED with a series resistor on PA1 (TIM2_CH2 PWM output). PA1 goes through the resistor, through the LED, and only then to GND. The potentiometer bottom terminal and the LED cathode share one GND line.</desc>
+<rect width="700" height="470" fill="#ffffff"/>
 
+<!-- Nucleo -->
 <rect x="40" y="40" width="200" height="400" rx="10" fill="#f5f5f2" stroke="#1a1a1a" stroke-width="1.5"/>
 <text x="140" y="70" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="700" fill="#1a1a1a">Nucleo-F446RE</text>
 
-<!-- 3V3 rail to potentiometer top -->
-<line x1="240" y1="90" x2="360" y2="90" stroke="#1a1a1a" stroke-width="2"/>
-<text x="245" y="80" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">3V3</text>
-<line x1="360" y1="90" x2="360" y2="140" stroke="#1a1a1a" stroke-width="2"/>
-
-<!-- Potentiometer body (vertical resistive element) -->
-<rect x="340" y="140" width="40" height="110" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-<text x="500" y="150" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">10kΩ potentiometer</text>
-<text x="500" y="166" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#555555">(linear, B103)</text>
-
-<!-- Wiper arrow pointing into the middle of the pot -->
-<line x1="300" y1="195" x2="336" y2="195" stroke="#1a1a1a" stroke-width="2"/>
-<polygon points="336,195 322,189 322,201" fill="#1a1a1a"/>
-<text x="245" y="178" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA0 (A0)</text>
-<text x="245" y="215" font-family="sans-serif" font-size="11" fill="#555555">wiper (pin 2)</text>
-
-<!-- Potentiometer bottom terminal routed AROUND the LED branch, joins GND bus on the far right -->
-<line x1="360" y1="250" x2="360" y2="270" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="360" y1="270" x2="640" y2="270" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="640" y1="270" x2="640" y2="420" stroke="#1a1a1a" stroke-width="2"/>
-
-<!-- PA1 -> resistor -> LED branch (in series, ending at the LED cathode only) -->
-<line x1="240" y1="320" x2="300" y2="320" stroke="#1a1a1a" stroke-width="2"/>
-<text x="245" y="303" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">PA1 (A1)</text>
-<text x="245" y="352" font-family="sans-serif" font-size="11" fill="#555555">TIM2_CH2 PWM</text>
-
-<rect x="300" y="310" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
-<text x="330" y="303" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
-
-<line x1="360" y1="320" x2="420" y2="320" stroke="#1a1a1a" stroke-width="2"/>
-
-<g>
-<polygon points="420,306 420,334 448,320" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
-<line x1="448" y1="306" x2="448" y2="334" stroke="#8a5a00" stroke-width="2"/>
-<line x1="452" y1="310" x2="460" y2="302" stroke="#8a5a00" stroke-width="1.5"/>
-<line x1="452" y1="318" x2="460" y2="310" stroke="#8a5a00" stroke-width="1.5"/>
+<g font-family="sans-serif" text-anchor="end">
+  <text x="228" y="96" font-size="13" font-weight="700" fill="#1a1a1a">PA1 (A1)</text>
+  <text x="228" y="115" font-size="11" fill="#555555">TIM2_CH2 PWM</text>
+  <text x="228" y="166" font-size="13" font-weight="700" fill="#c0392b">3V3</text>
+  <text x="228" y="241" font-size="13" font-weight="700" fill="#1a1a1a">PA0 (A0)</text>
+  <text x="228" y="260" font-size="11" fill="#555555">ADC1_IN0 · wiper (pin 2)</text>
 </g>
-<text x="434" y="356" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">LEDY</text>
 
-<!-- LED cathode down to the shared GND bus -->
-<line x1="448" y1="320" x2="560" y2="320" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="560" y1="320" x2="560" y2="420" stroke="#1a1a1a" stroke-width="2"/>
+<!-- PA1 -> resistor -> LED -> GND line (signal blue, GND grey) -->
+<line x1="240" y1="100" x2="300" y2="100" stroke="#2f6fed" stroke-width="2.5"/>
+<rect x="300" y="90" width="60" height="20" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<text x="330" y="82" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">R 330Ω</text>
+<line x1="360" y1="100" x2="420" y2="100" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="420,86 420,114 448,100" fill="#f5a623" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="448" y1="86" x2="448" y2="114" stroke="#8a5a00" stroke-width="2"/>
+<line x1="452" y1="90" x2="460" y2="82" stroke="#8a5a00" stroke-width="1.5"/>
+<line x1="452" y1="98" x2="460" y2="90" stroke="#8a5a00" stroke-width="1.5"/>
+<text x="434" y="138" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a1a1a">LEDY (external)</text>
+<line x1="448" y1="100" x2="580" y2="100" stroke="#555555" stroke-width="2.5"/>
+<line x1="580" y1="100" x2="580" y2="400" stroke="#555555" stroke-width="2.5"/>
 
-<!-- shared GND bus: LED cathode (560) and potentiometer bottom terminal (640) join here -->
-<line x1="560" y1="420" x2="640" y2="420" stroke="#1a1a1a" stroke-width="2"/>
-<circle cx="560" cy="420" r="4" fill="#1a1a1a"/>
-<circle cx="640" cy="420" r="4" fill="#1a1a1a"/>
+<!-- 3V3 -> potentiometer top -->
+<line x1="240" y1="170" x2="380" y2="170" stroke="#c0392b" stroke-width="2.5"/>
+<line x1="380" y1="170" x2="380" y2="190" stroke="#c0392b" stroke-width="2.5"/>
 
-<line x1="580" y1="420" x2="620" y2="420" stroke="#1a1a1a" stroke-width="2.5"/>
-<line x1="588" y1="428" x2="612" y2="428" stroke="#1a1a1a" stroke-width="2"/>
-<line x1="595" y1="436" x2="605" y2="436" stroke="#1a1a1a" stroke-width="1.5"/>
-<text x="600" y="456" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">GND</text>
+<!-- Potentiometer -->
+<rect x="360" y="190" width="40" height="110" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+<text x="420" y="240" font-family="sans-serif" font-size="12" fill="#1a1a1a">10kΩ potentiometer</text>
+<text x="420" y="258" font-family="sans-serif" font-size="11" fill="#555555">(linear, B103)</text>
+
+<!-- wiper: PA0 -->
+<line x1="240" y1="245" x2="344" y2="245" stroke="#2f6fed" stroke-width="2.5"/>
+<polygon points="358,245 344,239 344,251" fill="#2f6fed"/>
+
+<!-- potentiometer bottom -> GND line -->
+<line x1="380" y1="300" x2="380" y2="400" stroke="#555555" stroke-width="2.5"/>
+<line x1="380" y1="400" x2="580" y2="400" stroke="#555555" stroke-width="2.5"/>
+<circle cx="380" cy="400" r="4" fill="#555555"/>
+<circle cx="580" cy="400" r="4" fill="#555555"/>
+
+<!-- GND symbol -->
+<circle cx="480" cy="400" r="4" fill="#555555"/>
+<line x1="480" y1="400" x2="480" y2="412" stroke="#555555" stroke-width="2.5"/>
+<line x1="466" y1="412" x2="494" y2="412" stroke="#555555" stroke-width="2.5"/>
+<line x1="472" y1="420" x2="488" y2="420" stroke="#555555" stroke-width="2"/>
+<line x1="477" y1="428" x2="483" y2="428" stroke="#555555" stroke-width="1.5"/>
+<text x="480" y="452" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#1a1a1a">GND</text>
 </svg>
