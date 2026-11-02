@@ -22,6 +22,7 @@ Each project is self-contained: its own STM32CubeIDE project (`.project`/`.cproj
 | 5 | [5_Timer_Interrupt](5_Timer_Interrupt) | Using **timers and timer interrupts** to read an HC-SR04 distance sensor and drive an LED |
 | 6.1 | [6_1_UART_HELLO_WORLD](6_1_UART_HELLO_WORLD) | **UART** basics: send and receive data between the board and a PC through a CH340G module |
 | 6.2 | [6_2_UART_Control_LED](6_2_UART_Control_LED) | Controlling an LED from the PC over **UART**, with the UART code organised as a small library |
+| 7.1 | [7_1_I2C](7_1_I2C) | **I2C** basics: read and set the time of a DS3231 real-time clock and show it on the PC |
 
 ## Folder structure (general)
 
@@ -36,7 +37,8 @@ STM32_F446RE/
 ├── 4_2_Multi_ADC_LED/           - project 4.2
 ├── 5_Timer_Interrupt/           - project 5
 ├── 6_1_UART_HELLO_WORLD/        - project 6.1
-└── 6_2_UART_Control_LED/        - project 6.2
+├── 6_2_UART_Control_LED/        - project 6.2
+└── 7_1_I2C/                     - project 7.1
 
 # each numbered project folder follows the same internal layout:
 <project>/

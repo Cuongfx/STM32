@@ -1,0 +1,40 @@
+<svg width="900" height="345" viewBox="0 0 900 345" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>I2C bit timing: START, data bits, ACK and STOP</title>
+<desc>Timing of one I2C byte. A START condition is SDA falling while SCL is high. Each of the eight data bits, most significant bit first, is stable while SCL is high. On the ninth clock the receiver pulls SDA low to acknowledge. A STOP condition is SDA rising while SCL is high.</desc>
+<rect width="900" height="345" fill="#ffffff"/>
+
+<text x="20" y="105" font-family="sans-serif" font-size="17" font-weight="bold" fill="#d97706">SDA</text>
+<text x="20" y="225" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2f6fed">SCL</text>
+
+<!-- guides for START and STOP -->
+<line x1="153" y1="60" x2="153" y2="205" stroke="#999999" stroke-width="1.5" stroke-dasharray="4 4"/>
+<line x1="824" y1="60" x2="824" y2="205" stroke="#999999" stroke-width="1.5" stroke-dasharray="4 4"/>
+<text x="153" y="50" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c0392b">START</text>
+<text x="824" y="50" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="bold" fill="#c0392b">STOP</text>
+
+<!-- SDA -->
+<path d="M60,70 H150 L156,130 H195 L205,100" fill="none" stroke="#d97706" stroke-width="3"/>
+<polygon points="205,100 220,70 310,70 325,100 310,130 220,130" fill="#ffffff" stroke="#d97706" stroke-width="3"/>
+<polygon points="325,100 340,70 430,70 445,100 430,130 340,130" fill="#ffffff" stroke="#d97706" stroke-width="3"/>
+<polygon points="525,100 540,70 630,70 645,100 630,130 540,130" fill="#ffffff" stroke="#d97706" stroke-width="3"/>
+<path d="M645,100 L655,130 H820 L828,70 H860" fill="none" stroke="#d97706" stroke-width="3"/>
+<text x="265" y="105" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#1a1a1a">MSB</text>
+<text x="385" y="105" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#1a1a1a">bit 6</text>
+<text x="585" y="105" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#1a1a1a">LSB</text>
+<text x="485" y="108" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#555555">···</text>
+
+<!-- SCL -->
+<path d="M60,190 H180 L186,250 H230 L236,190 H300 L306,250 H350 L356,190 H420 L426,250 H440" fill="none" stroke="#2f6fed" stroke-width="3"/>
+<path d="M510,250 H550 L556,190 H620 L626,250 H670 L676,190 H740 L746,250 H790 L796,190 H860" fill="none" stroke="#2f6fed" stroke-width="3"/>
+<text x="485" y="238" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#555555">···</text>
+<text x="268" y="178" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#555555">1</text>
+<text x="388" y="178" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#555555">2</text>
+<text x="588" y="178" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#555555">8</text>
+<text x="708" y="178" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#555555">9</text>
+
+<text x="705" y="153" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#2e7d32">ACK: receiver pulls SDA low</text>
+
+<text x="60" y="285" font-family="sans-serif" font-size="14" fill="#333333">START: SDA falls while SCL is high.   STOP: SDA rises while SCL is high.</text>
+<text x="60" y="308" font-family="sans-serif" font-size="14" fill="#333333">Data: SDA changes only while SCL is low and stays stable while SCL is high.</text>
+<text x="60" y="331" font-family="sans-serif" font-size="14" fill="#333333">One byte = 8 data bits (MSB first) + 1 ACK bit = 9 clock pulses.</text>
+</svg>
