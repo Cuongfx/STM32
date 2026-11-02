@@ -155,153 +155,72 @@ Three wires and two USB cables, one per board. TX goes to RX; GND is mandatory b
 
 ## Code
 
-Create `Core/Inc/uart_led.h` and `Core/Src/uart_led.c` (CubeIDE already has `Core/Inc` on the include path and builds everything in `Core/Src`). In `main.c`, write only between the `USER CODE BEGIN/END` markers; anything outside them is erased when CubeMX regenerates.
+Create `Core/Inc/uart_led.h` and `Core/Src/uart_led.c` (CubeIDE already searches `Core/Inc` and builds `Core/Src`). In `main.c`, write only between the `USER CODE BEGIN/END` markers; anything outside them is erased when CubeMX regenerates.
 
-### `uart_led.h`
+Reference solution: [uart_led.h](Core/Inc/uart_led.h), [uart_led.c](Core/Src/uart_led.c), [main.c](Core/Src/main.c).
 
-```c
-#ifndef UART_LED_H
-#define UART_LED_H
+### API
 
-#include "main.h"
+`uart_led.h` holds only these prototypes behind an include guard (`#ifndef` … `#endif`, so a second inclusion is skipped) and includes `main.h` for HAL and the generated `LD2_*` names.
 
-void UART_LED_Init(UART_HandleTypeDef *huart);
-void UART_LED_Process(void);
-void UART_LED_RxCallback(UART_HandleTypeDef *huart);
-void UART_LED_ErrorCallback(UART_HandleTypeDef *huart);
+| Function | Parameters | Returns | Purpose |
+|---|---|---|---|
+| `UART_LED_Init` | `UART_HandleTypeDef *huart` | – | Keep the UART, switch the LED off, send the greeting, arm reception |
+| `UART_LED_Process` | – | – | Call from `while(1)`: act on a waiting command and reply |
+| `UART_LED_RxCallback` | `UART_HandleTypeDef *huart` | – | Interrupt side: store the byte, raise the flag, re-arm |
+| `UART_LED_ErrorCallback` | `UART_HandleTypeDef *huart` | – | Recover from an overrun |
 
-#endif
-```
+### State in `uart_led.c`
 
-`#ifndef … #endif` is an include guard (a second inclusion is skipped). `main.h` brings in HAL and the generated `LD2_*` names.
-
-### `uart_led.c`
-
-Write the file top to bottom: each function must be defined above the code that calls it.
-
-**State and helper**
+Define each function above the code that calls it. The library keeps four private (`static`) variables:
 
 ```c
-#include "uart_led.h"
-#include <string.h>
-
 static UART_HandleTypeDef *led_uart;   // the UART given to Init
 static uint8_t rx_byte;                // landing slot HAL writes the received byte into
 static volatile uint8_t rx_cmd;        // mailbox: the command, kept for the main loop
-static volatile uint8_t rx_ready = 0;  // flag: 1 = a new command is waiting
-
-static void UART_LED_Send(const char *msg)
-{
-  HAL_UART_Transmit(led_uart, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY);
-}
+static volatile uint8_t rx_ready;      // flag: 1 = a new command is waiting
 ```
 
-`rx_cmd` and `rx_ready` are written by the interrupt and read by `while(1)`, so they are `volatile`: otherwise the compiler may read them once and never again (works at `-O0`, breaks at `-O2`). `rx_byte` is only touched by HAL and the callback, so it is not.
+`rx_cmd` and `rx_ready` are written by the interrupt and read by `while(1)`, so they are `volatile`: otherwise the compiler may read them once and never again (works at `-O0`, breaks at `-O2`). `rx_byte` is only touched by HAL and the callback, so it is not. A private helper `UART_LED_Send(msg)` wraps `HAL_UART_Transmit(led_uart, (uint8_t *)msg, strlen(msg), HAL_MAX_DELAY)`.
 
-**Init**
+### Idea per function
 
-```c
-void UART_LED_Init(UART_HandleTypeDef *huart)
-{
-  led_uart = huart;   // the parameter dies when Init returns; the static variable lives on
-
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-  UART_LED_Send("\r\nUART LED ready. Send 'a' = ON, 'b' = OFF\r\n");
-
-  HAL_UART_Receive_IT(led_uart, &rx_byte, 1);
-}
-```
-
-The greeting proves the TX wire, baud rate and COM port are right. `HAL_UART_Receive_IT()` receives nothing itself: it enables the interrupt and returns.
-
-**Interrupt side**
-
-```c
-void UART_LED_RxCallback(UART_HandleTypeDef *huart)
-{
-  if (huart != led_uart) return;     // HAL calls this for every UART on the chip
-
-  rx_cmd   = rx_byte;                // copy out before the next byte overwrites rx_byte
+- **`UART_LED_Init`**: 1) store `huart` in `led_uart` (the parameter dies when Init returns, the static lives on); 2) switch `LD2` off; 3) send the greeting, which proves the TX wire, baud rate and COM port; 4) call `HAL_UART_Receive_IT(led_uart, &rx_byte, 1)`. It receives nothing itself: it enables the interrupt and returns.
+- **`UART_LED_RxCallback`** (interrupt side): 1) return if `huart != led_uart` (HAL calls this for every UART on the chip); 2) copy the byte into the mailbox and raise the flag; 3) re-arm.
+  ```c
+  rx_cmd   = rx_byte;                           // copy out before the next byte overwrites rx_byte
   rx_ready = 1;
-
   HAL_UART_Receive_IT(led_uart, &rx_byte, 1);   // one-shot: re-arm or the board goes deaf
-}
-
-void UART_LED_ErrorCallback(UART_HandleTypeDef *huart)
-{
-  if (huart != led_uart) return;
-
+  ```
+- **`UART_LED_ErrorCallback`**: USART1 has no receive queue. If a byte arrives before the previous one is read, the overrun flag is raised and HAL cancels the armed reception. Clear it and re-arm, or the UART goes permanently deaf while sending still looks healthy.
+  ```c
   __HAL_UART_CLEAR_OREFLAG(led_uart);
   HAL_UART_Receive_IT(led_uart, &rx_byte, 1);
-}
-```
-
-If a byte arrives before the previous one is read (USART1 has no queue), the **overrun** flag is raised and HAL cancels the armed reception. The error callback clears it and re-arms; without it the UART goes permanently deaf.
-
-**Main-loop side**
-
-```c
-void UART_LED_Process(void)
-{
-  if (!rx_ready) return;        // called millions of times a second: exit fast when idle
-
-  uint8_t cmd = rx_cmd;         // local copy: stays valid even if a new byte arrives
+  ```
+- **`UART_LED_Process`** (main loop): 1) return at once if `rx_ready` is 0, since this runs millions of times a second; 2) copy `rx_cmd` into a local, then clear the flag; 3) `switch` on the command: `'a'` sets `LD2` (`GPIO_PIN_SET`) and replies `LED ON`, `'b'` resets it and replies `LED OFF`, `'\r'` and `'\n'` are ignored, `default` sends the warning.
+  ```c
+  uint8_t cmd = rx_cmd;   // local copy stays valid even if a new byte arrives
   rx_ready = 0;
+  ```
+  *Watch out:* copy the command **before** clearing the flag. Ignoring `'\r'` and `'\n'` stops terminals that append Enter from adding two warnings after every `a`.
 
-  switch (cmd)
-  {
-    case 'a':
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-      UART_LED_Send("LED ON\r\n");
-      break;
+### Where it goes in `main.c`
 
-    case 'b':
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-      UART_LED_Send("LED OFF\r\n");
-      break;
-
-    case '\r':                  // Enter: PuTTY and Tera Term append it to every send
-    case '\n':
-      break;
-
-    default:
-      UART_LED_Send("Please choose a to turn on LED or b to turn off LED\r\n");
-      break;
-  }
-}
-```
-
-Copy the command **before** clearing the flag. Ignoring `'\r'` and `'\n'` stops terminals that append Enter from adding two extra warnings after every `a`.
-
-### `main.c`
+| Marker | Code |
+|---|---|
+| `Includes` | `#include "uart_led.h"` |
+| `0` | `HAL_UART_RxCpltCallback` and `HAL_UART_ErrorCallback`, each one line forwarding to the library |
+| `2` | `UART_LED_Init(&huart1);` after `MX_GPIO_Init()` and `MX_USART1_UART_Init()` |
+| `3` (in `while(1)`) | `UART_LED_Process();` |
 
 ```c
-/* USER CODE BEGIN Includes */
-#include "uart_led.h"
-/* USER CODE END Includes */
-
-/* USER CODE BEGIN 0 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   UART_LED_RxCallback(huart);
 }
-
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-  UART_LED_ErrorCallback(huart);
-}
-/* USER CODE END 0 */
-
-/* USER CODE BEGIN 2 */
-UART_LED_Init(&huart1);       // after MX_GPIO_Init() and MX_USART1_UART_Init()
-/* USER CODE END 2 */
-
-/* USER CODE BEGIN 3 */
-UART_LED_Process();           // inside while(1)
-/* USER CODE END 3 */
 ```
 
-The HAL callbacks live in `main.c` because a weak symbol may be overridden **once** per program: if the library defined it, a second UART module (GPS, Bluetooth) would fail to link. One definition in `main.c` forwarding to each library lets every module have its turn. `UART_LED_Init()` goes in `USER CODE 2` because the GPIO and USART1 are initialised by then.
+The HAL callbacks live in `main.c` because a weak symbol may be overridden **once** per program: if the library defined it, a second UART module (GPS, Bluetooth) would fail to link. One definition in `main.c` forwarding to each library lets every module have its turn.
 
 ## Folder structure
 

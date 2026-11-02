@@ -18,7 +18,9 @@ Two LEDs blink at two different rates inside the same `while(1)` loop:
 - **LD2** — the LED built into the Nucleo board (`PA5`). No wiring needed.
 - **LEDY** — an external LED wired to `PA1`.
 
-## Theory: blocking vs non-blocking delay
+## Theory
+
+### Blocking vs non-blocking delay
 
 `HAL_Delay()` **blocks**: the CPU sits inside the function until the time is up, so nothing else can run. Blink LD2 with it and LEDY cannot blink at the same time.
 

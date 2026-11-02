@@ -1,6 +1,6 @@
 # STM32F446RE — Teaching Projects
 
-A collection of small, progressively-harder STM32 embedded projects built on the **Nucleo-F446RE** board, developed as teaching material for RPTU to introduce students to bare-metal / HAL-based STM32 programming with STM32CubeIDE.
+A collection of small, progressively-harder STM32 embedded projects built on the **Nucleo-F446RE** board, developed as teaching material to introduce students to bare-metal / HAL-based STM32 programming with STM32CubeIDE.
 
 Each project is self-contained: its own STM32CubeIDE project (`.project`/`.cproject`/`.ioc`), its own wiring diagram, and its own `README.md` explaining what it teaches and why it's built the way it is. Start at project 1 and work forward — each one reuses a concept from the previous one.
 

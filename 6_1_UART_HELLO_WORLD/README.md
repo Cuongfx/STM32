@@ -143,100 +143,60 @@ Three wires and two USB cables, one per board. TX goes to RX. GND is mandatory b
 
 ## Code
 
-Everything is in `Core/Src/main.c`, inside the `USER CODE` markers (code outside them is erased when CubeMX regenerates).
+Everything is in `Core/Src/main.c`, inside the `USER CODE` markers (code outside them is erased when CubeMX regenerates). Reference solution: [main.c](Core/Src/main.c).
 
-**Globals and constants**
+| Marker | Code |
+|---|---|
+| `Includes` | `<stdio.h>` for `snprintf` |
+| `PD` | `COUNT_INTERVAL_MS` (1000) and `COUNT_MAX` (100) |
+| `PV` | `static uint8_t rx_byte` (the slot HAL receives into), `volatile uint8_t running = 1` |
+| `0` | `HAL_UART_RxCpltCallback` and `HAL_UART_ErrorCallback` |
+| `2` | `char buf[64]`, `count`, `last_tick`, and one `HAL_UART_Receive_IT(&huart1, &rx_byte, 1)` to arm reception |
+| `3` (in `while(1)`) | the counting loop |
+
+### Receive side
+
+One character is a whole command, so no buffer and no string compare are needed.
+
+1. In `HAL_UART_RxCpltCallback`, check `huart->Instance == USART1` (the callback is shared by every UART on the chip).
+2. `'s'` sets `running = 0`, `'r'` sets `running = 1`.
+3. Re-arm.
 
 ```c
-/* USER CODE BEGIN Includes */
-#include <stdio.h>
-/* USER CODE END Includes */
-
-/* USER CODE BEGIN PD */
-#define COUNT_INTERVAL_MS 1000U
-#define COUNT_MAX 100U
-/* USER CODE END PD */
-
-/* USER CODE BEGIN PV */
-static uint8_t rx_byte;               // landing slot HAL writes the received byte into
-volatile uint8_t running = 1;         // set by the interrupt, read by main()
-/* USER CODE END PV */
+if (rx_byte == 's') running = 0;
+if (rx_byte == 'r') running = 1;
+HAL_UART_Receive_IT(&huart1, &rx_byte, 1);   // one-shot: without the re-arm you receive exactly one character, ever
 ```
 
 `running` is `volatile` because the main loop never assigns it: without `volatile` the compiler may read it once and never again, and the interrupt would update memory nobody looks at. That works at `-O0` (Debug) and breaks at `-O2` (Release).
 
-**Callbacks**
+`HAL_UART_ErrorCallback` handles the **overrun**. USART1 has one receive register and no queue; if a byte arrives before the previous one is read, the `ORE` flag is raised and HAL *cancels the armed reception*. Clear the flag and re-arm, or the UART goes permanently deaf while transmission still looks healthy.
 
 ```c
-/* USER CODE BEGIN 0 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  if (huart->Instance == USART1)
-  {
-    if (rx_byte == 's') running = 0;
-    if (rx_byte == 'r') running = 1;
-    HAL_UART_Receive_IT(&huart1, &rx_byte, 1);   // re-arm
-  }
-}
-
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-  if (huart->Instance == USART1)
-  {
-    __HAL_UART_CLEAR_OREFLAG(&huart1);
-    HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
-  }
-}
-/* USER CODE END 0 */
+__HAL_UART_CLEAR_OREFLAG(&huart1);
+HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
 ```
 
-- One character is a whole command, so no buffer and no string compare are needed.
-- `huart->Instance == USART1`: the callback is shared by every UART on the chip.
-- `HAL_UART_Receive_IT()` is a **one-shot**: it receives the requested bytes, fires the callback and disarms itself. Without the re-arm you receive exactly one character, ever.
-- USART1 has one receive register and no queue. If a byte arrives before the previous one is read, the **overrun** flag `ORE` is raised and HAL *cancels the armed reception*. `HAL_UART_ErrorCallback()` clears the flag and re-arms; without it the UART goes permanently deaf while transmission still looks healthy.
+### Counting loop
 
-**Setup and main loop**
+1. While paused, keep `last_tick` current.
+2. Otherwise, when `HAL_GetTick() - last_tick >= COUNT_INTERVAL_MS`, step `last_tick` forward by one interval.
+3. On the very first count, send the `Hello World` line first.
+4. Format the number into `buf` and transmit it; wrap `count` after `COUNT_MAX`.
 
 ```c
-/* USER CODE BEGIN 2 */
-char     buf[64];
-int      n;
-uint32_t count     = 1;
-uint32_t last_tick = HAL_GetTick();
-
-HAL_UART_Receive_IT(&huart1, &rx_byte, 1);   // initial arming
-/* USER CODE END 2 */
-
-/* USER CODE BEGIN 3 */
-if (!running)
-{
-  last_tick = HAL_GetTick();
-}
-else if (HAL_GetTick() - last_tick >= COUNT_INTERVAL_MS)
-{
-  last_tick += COUNT_INTERVAL_MS;
-
-  if (count == 1)
-  {
-    n = snprintf(buf, sizeof(buf),
-                 "\r\nHello World, I am counting to %u....\r\n", COUNT_MAX);
-    HAL_UART_Transmit(&huart1, (uint8_t *)buf, n, HAL_MAX_DELAY);
-  }
-
-  n = snprintf(buf, sizeof(buf), "%lu....\r\n", (unsigned long)count);
-  HAL_UART_Transmit(&huart1, (uint8_t *)buf, n, HAL_MAX_DELAY);
-
-  count = (count >= COUNT_MAX) ? 1 : count + 1;
-}
-/* USER CODE END 3 */
+last_tick += COUNT_INTERVAL_MS;                        // fixed grid, no drift
+n = snprintf(buf, sizeof(buf), "%lu....\r\n", (unsigned long)count);
+HAL_UART_Transmit(&huart1, (uint8_t *)buf, n, HAL_MAX_DELAY);
+count = (count >= COUNT_MAX) ? 1 : count + 1;
 ```
 
-- **`snprintf` into `buf`**: `count` is a binary number (`42` is the byte `0x2A`), but the terminal needs the characters `'4'` `'2'`. `snprintf` converts and is bounded by `sizeof(buf)`; its return value is the length `HAL_UART_Transmit` needs. `%lu` with a cast matches `uint32_t` on this toolchain.
+- **`snprintf` into `buf`**: `count` is a binary number (`42` is the byte `0x2A`), but the terminal needs the characters `'4'` `'2'`. `snprintf` converts, is bounded by `sizeof(buf)`, and its return value is the length `HAL_UART_Transmit` needs. `%lu` with a cast matches `uint32_t` on this toolchain.
 - **`\r\n`, not `\n`**: the carriage return moves the cursor back to column one, otherwise the output marches diagonally.
-- **`HAL_GetTick() - last_tick >= INTERVAL`**: the unsigned subtraction stays correct when the 32-bit tick wraps (about every 49.7 days).
+- **Unsigned subtraction** `HAL_GetTick() - last_tick` stays correct when the 32-bit tick wraps (about every 49.7 days).
 - **`last_tick += INTERVAL`, not `= HAL_GetTick()`**: each deadline stays on a fixed grid instead of drifting by the time the transmit took.
-- **`if (!running) last_tick = HAL_GetTick();`**: while paused, `last_tick` would stand still and the difference would grow; on `r` the condition would fire many times in a row and dump a burst of numbers. Keeping `last_tick` current means there is no debt to repay. Nothing blocks, so `r` takes effect instantly.
-- **`count + 1`, never `count++`**: `count++` evaluates to the old value, which the assignment writes straight back, so the count never moves (and it is undefined behaviour to modify `count` twice in one expression).
+- **`if (!running) last_tick = HAL_GetTick();`**: while paused, `last_tick` would stand still and the difference would grow; on `r` the condition would fire many times in a row and dump a burst of numbers. Nothing blocks, so `r` takes effect instantly.
+- **`count + 1`, never `count++`**: `count++` evaluates to the old value, which the assignment writes straight back, so the count never moves (and modifying `count` twice in one expression is undefined behaviour).
 
 ## Folder structure
 

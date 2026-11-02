@@ -96,119 +96,54 @@ Update period = Tick period × (ARR + 1)
 
 ## Code
 
-### Sensor module (`lib/sensor.h`, `lib/sensor.c`)
-
-The driver is hand-written, not generated, and handles **sensor signal processing only**: Trig, Echo and a distance in cm. It knows nothing about LEDs or PWM; the brightness mapping stays in `main.c`.
+The driver in `lib/` is hand-written and handles **sensor signal processing only**: Trig, Echo and a distance in cm. It knows nothing about LEDs, PWM or TIM6; the brightness mapping stays in `main.c`. Reference solution: [lib/sensor.h](lib/sensor.h), [lib/sensor.c](lib/sensor.c), [Core/Src/main.c](Core/Src/main.c).
 
 To make CubeIDE build `lib/`: add `../lib` under **Properties → C/C++ Build → Settings → MCU GCC Compiler → Include paths**, and add the `lib` folder under **C/C++ General → Paths and Symbols → Source Location** (once per configuration, Debug and Release).
 
-**`sensor.h`**
+### Architecture
+
+- `sensor.c` owns TIM3 (the µs timebase), the Trig and Echo pins and the latest distance. Its handles live in `static` variables set by `Sensor_Init`.
+- `main.c` connects the pieces: the TIM6 callback calls `Sensor_Trigger()`, the EXTI callback calls `Sensor_EXTI_Callback()`, and the loop turns the distance into a TIM4 duty value.
+
+| Function | Parameters | Returns | Purpose |
+|---|---|---|---|
+| `Sensor_Init` | µs timer handle, Trig port + pin, Echo port + pin | – | Keep the handles, start TIM3 free-running |
+| `Sensor_Trigger` | – | – | Call every 60ms: send the 10µs Trig pulse (ignored while the last echo is still pending) |
+| `Sensor_EXTI_Callback` | `uint16_t GPIO_Pin` | – | Forward every EXTI interrupt: timestamp both Echo edges |
+| `Sensor_GetDistanceCm` | – | `uint32_t` | Latest distance, safe to call at any time |
+
+### Idea per function
+
+- **`delay_us`** (private): busy-wait on TIM3's counter without ever resetting it. The 16-bit subtraction stays correct when `CNT` wraps around.
+  ```c
+  while ((uint16_t)((uint16_t)__HAL_TIM_GET_COUNTER(s_htim_us) - start) < us) { }
+  ```
+- **`Sensor_Trigger`**: 1) return if a measurement is still busy, else mark it busy; 2) Trig HIGH; 3) `delay_us(10)`; 4) Trig LOW.
+- **`Sensor_EXTI_Callback`**: 1) ignore other pins; 2) read the Echo level to learn which edge fired: HIGH stores `CNT` as the start, LOW stores it as the end; 3) on the falling edge, convert the pulse width to a distance, clamp it to 2–400cm, store it and clear the busy flag.
+  ```c
+  uint16_t pulse_width_us = (uint16_t)(s_echo_end - s_echo_start);
+  uint32_t distance = (uint32_t)(0.017f * (float)pulse_width_us);   // S = 0.017 × T
+  ```
+  *Watch out:* one both-edge EXTI line serves both edges, so the pin level inside the callback is the only way to tell them apart.
+
+### In `main.c`
+
+| Marker | Code |
+|---|---|
+| `Includes` | `#include "sensor.h"` and the two constants `LED_ACTIVE_RANGE_CM` (50) and `PWM_MAX_DUTY` (999) |
+| `2`, after the `MX_..._Init()` calls | `Sensor_Init(&htim3, TRIG_GPIO_Port, TRIG_Pin, ECHO_GPIO_Port, ECHO_Pin)`, `HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1)`, `HAL_TIM_Base_Start_IT(&htim6)` |
+| `3` (in `while(1)`) | read the distance, map it, write the compare register |
+| `4` | `HAL_GPIO_EXTI_Callback` calls `Sensor_EXTI_Callback(GPIO_Pin)`; `HAL_TIM_PeriodElapsedCallback` calls `Sensor_Trigger()` when `htim->Instance == TIM6` |
+
+The mapping is a linear inverse: 2cm gives `duty = 999` (brightest), 50cm gives `duty = 0` (off).
 
 ```c
-void Sensor_Init(TIM_HandleTypeDef *htim_us,
-                 GPIO_TypeDef *trig_port, uint16_t trig_pin,
-                 GPIO_TypeDef *echo_port, uint16_t echo_pin);
-void Sensor_Trigger(void);                      // call every 60ms (from TIM6's callback)
-void Sensor_EXTI_Callback(uint16_t GPIO_Pin);   // forward every EXTI interrupt here
-uint32_t Sensor_GetDistanceCm(void);            // latest result, safe to call anytime
+uint32_t led_cm = (distance_cm > LED_ACTIVE_RANGE_CM) ? LED_ACTIVE_RANGE_CM : distance_cm;
+uint32_t duty = PWM_MAX_DUTY - ((led_cm - 2) * PWM_MAX_DUTY / (LED_ACTIVE_RANGE_CM - 2));
+__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty);
 ```
 
-**`sensor.c`**
-
-```c
-void Sensor_Init(TIM_HandleTypeDef *htim_us,
-                 GPIO_TypeDef *trig_port, uint16_t trig_pin,
-                 GPIO_TypeDef *echo_port, uint16_t echo_pin)
-{
-  s_htim_us   = htim_us;     // parameters are local, so keep them in static variables
-  s_trig_port = trig_port;
-  s_trig_pin  = trig_pin;
-  s_echo_port = echo_port;
-  s_echo_pin  = echo_pin;
-
-  HAL_TIM_Base_Start(s_htim_us);   // TIM3 starts free-running
-}
-
-static void delay_us(uint16_t us)   // busy-wait on TIM3's counter, never resets it
-{
-  uint16_t start = (uint16_t)__HAL_TIM_GET_COUNTER(s_htim_us);
-  while ((uint16_t)((uint16_t)__HAL_TIM_GET_COUNTER(s_htim_us) - start) < us)
-  {
-  }
-}
-
-void Sensor_Trigger(void)
-{
-  if (s_measurement_busy) return;    // ignore if the previous echo has not finished
-  s_measurement_busy = 1;
-
-  HAL_GPIO_WritePin(s_trig_port, s_trig_pin, GPIO_PIN_SET);
-  delay_us(TRIG_PULSE_US);           // 10µs
-  HAL_GPIO_WritePin(s_trig_port, s_trig_pin, GPIO_PIN_RESET);
-}
-
-void Sensor_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  if (GPIO_Pin != s_echo_pin) return;
-
-  if (HAL_GPIO_ReadPin(s_echo_port, s_echo_pin) == GPIO_PIN_SET)
-  {
-    s_echo_start = __HAL_TIM_GET_COUNTER(s_htim_us);          // rising edge
-  }
-  else
-  {
-    s_echo_end = __HAL_TIM_GET_COUNTER(s_htim_us);            // falling edge
-    uint16_t pulse_width_us = (uint16_t)(s_echo_end - s_echo_start);
-
-    uint32_t distance = (uint32_t)(0.017f * (float)pulse_width_us);
-    if (distance < SENSOR_MIN_CM) distance = SENSOR_MIN_CM;
-    if (distance > SENSOR_MAX_CM) distance = SENSOR_MAX_CM;
-    s_distance_cm = distance;
-
-    s_measurement_busy = 0;
-  }
-}
-```
-
-`Sensor_GetDistanceCm()` returns `s_distance_cm`.
-
-### `main.c`
-
-```c
-#include "sensor.h"
-
-#define LED_ACTIVE_RANGE_CM 50   // beyond this distance the LED is fully off
-#define PWM_MAX_DUTY        999
-
-/* After the MX_..._Init() calls */
-Sensor_Init(&htim3, TRIG_GPIO_Port, TRIG_Pin, ECHO_GPIO_Port, ECHO_Pin);
-HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
-HAL_TIM_Base_Start_IT(&htim6);
-
-while (1)
-{
-  uint32_t distance_cm = Sensor_GetDistanceCm();
-  uint32_t led_cm = (distance_cm > LED_ACTIVE_RANGE_CM) ? LED_ACTIVE_RANGE_CM : distance_cm;
-  uint32_t duty = PWM_MAX_DUTY - ((led_cm - 2) * PWM_MAX_DUTY / (LED_ACTIVE_RANGE_CM - 2));
-  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, duty);
-}
-
-/* The only two places where TIM6 and EXTI reach the driver */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  Sensor_EXTI_Callback(GPIO_Pin);
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM6)
-  {
-    Sensor_Trigger();
-  }
-}
-```
-
-The mapping is a linear inverse: 2cm gives `duty = 999` (brightest), 50cm gives `duty = 0` (off). The clamp (`? :`, a one-line `if/else`) keeps `led_cm` at 50 or below, so a far object reads as "off" instead of the unsigned subtraction wrapping into a huge number.
+The clamp keeps `led_cm` at 50 or below, so a far object reads as "off" instead of the unsigned subtraction wrapping into a huge number.
 
 ## Folder structure
 
