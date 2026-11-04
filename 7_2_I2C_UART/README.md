@@ -1,4 +1,4 @@
-# 7.1 — I2C: DS3231 Real-Time Clock over UART
+# 7.2 — I2C: DS3231 Real-Time Clock over UART
 
 **Board:** Nucleo-F446RE (STM32F446RETx)
 **IDE:** STM32CubeIDE (GCC / make)
@@ -126,7 +126,7 @@ The UART frame, baud rate and TX/RX crossing are explained in [6_1_UART_HELLO_WO
 
 ## CubeMX setup
 
-1. `File → New → STM32 Project` → Board Selector → **NUCLEO-F446RE** → Next → name it `7_1_I2C` → finish the wizard.
+1. `File → New → STM32 Project` → Board Selector → **NUCLEO-F446RE** → Next → name it `7_2_I2C_UART` → finish the wizard.
 2. **Connectivity → I2C1**: Mode = `I2C`. Check the pinout shows **PB8 = I2C1_SCL** and **PB9 = I2C1_SDA** (re-pick them if CubeMX chose PB6/PB7). **I2C Speed Mode** = `Standard Mode`, **Clock Speed** = `100000`.
 3. **Connectivity → USART1**: Mode = `Asynchronous`. Pinout **PA9 = USART1_TX**, **PA10 = USART1_RX**. **Baud Rate** = `115200`, **Word Length** = `8 Bits`, **Parity** = `None`, **Stop Bits** = `1`.
 4. **USART1 → NVIC Settings** → tick **USART1 global interrupt**. Without it the board never receives a byte and nothing reports an error.
@@ -237,10 +237,10 @@ Place the code in these markers:
 ## Folder structure
 
 ```
-7_1_I2C/
+7_2_I2C_UART/
 ├── Core/Inc/ds3231.h, Core/Src/ds3231.c   - DS3231 driver: BCD, register read/write, day of week
 ├── Core/Inc/ch340g.h, Core/Src/ch340g.c   - UART library: formatted send, line receive by interrupt
 ├── Core/Src/main.c                        - glue: SET command, one print per second
-├── 7_1_I2C.ioc                            - CubeMX project (I2C1 on PB8/PB9, USART1 on PA9/PA10 + interrupt)
+├── 7_2_I2C_UART.ioc                          - CubeMX project (I2C1 on PB8/PB9, USART1 on PA9/PA10 + interrupt)
 └── diagrams/                              - i2c_bus, i2c_bit_timing, i2c_write, i2c_read, wiring_diagram (.svg)
 ```
