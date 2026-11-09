@@ -22,7 +22,24 @@ Each project is self-contained: its own STM32CubeIDE project (`.project`/`.cproj
 | 5 | [5_Timer_Interrupt](5_Timer_Interrupt) | Using **timers and timer interrupts** to read an HC-SR04 distance sensor and drive an LED |
 | 6.1 | [6_1_UART_HELLO_WORLD](6_1_UART_HELLO_WORLD) | **UART** basics: send and receive data between the board and a PC through a CH340G module |
 | 6.2 | [6_2_UART_Control_LED](6_2_UART_Control_LED) | Controlling an LED from the PC over **UART**, with the UART code organised as a small library |
-| 7.1 | [7_1_I2C](7_1_I2C) | **I2C** basics: read and set the time of a DS3231 real-time clock and show it on the PC |
+| 7.1a | [7_1_a_I2C_DS3231](7_1_a_I2C_DS3231) | **I2C** basics: read and set the time of a DS3231 real-time clock, with the driver in its own library |
+| 7.2 | [7_2_I2C_UART](7_2_I2C_UART) | **I2C** basics: read and set the time of a DS3231 real-time clock and show it on the PC |
+| 8.1 | [8_1_BMS_Control](8_1_BMS_Control) | Reading the cell voltages of a battery pack with the bq76920 battery-monitor chip over **I2C** |
+
+## USER CODE blocks
+
+CubeMX regenerates `main.c` every time you press Generate. It keeps only what sits between a `/* USER CODE BEGIN x */` and `/* USER CODE END x */` pair; anything you write outside those pairs is lost. The project READMEs name the block for each piece of code with the short names below.
+
+| Block | Where it is in `main.c` | Use it for |
+|---|---|---|
+| `Includes` | top of the file | `#include` lines |
+| `PV` | before `main()` | global variables |
+| `0` | before `main()`, after the variables | your own functions |
+| `2` | in `main()`, after all `MX_..._Init()` calls, before `while (1)` | start-up code that runs once |
+| `3` | inside `while (1)` | code that runs repeatedly |
+| `4` | after `main()` | callbacks such as `HAL_UART_RxCpltCallback` |
+
+Put start-up code in block `2`, not earlier: the peripheral handles (`hi2c1`, `huart2`) are only initialised once the `MX_..._Init()` calls have run.
 
 ## Folder structure (general)
 
@@ -38,7 +55,9 @@ STM32_F446RE/
 ├── 5_Timer_Interrupt/           - project 5
 ├── 6_1_UART_HELLO_WORLD/        - project 6.1
 ├── 6_2_UART_Control_LED/        - project 6.2
-└── 7_1_I2C/                     - project 7.1
+├── 7_1_a_I2C_DS3231/            - project 7.1a
+├── 7_2_I2C_UART/                - project 7.2
+└── 8_1_BMS_Control/             - project 8.1
 
 # each numbered project folder follows the same internal layout:
 <project>/
