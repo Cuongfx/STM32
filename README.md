@@ -25,6 +25,8 @@ Each project is self-contained: its own STM32CubeIDE project (`.project`/`.cproj
 | 7.1a | [7_1_a_I2C_DS3231](7_1_a_I2C_DS3231) | **I2C** basics: read and set the time of a DS3231 real-time clock, with the driver in its own library |
 | 7.2 | [7_2_I2C_UART](7_2_I2C_UART) | **I2C** basics: read and set the time of a DS3231 real-time clock and show it on the PC |
 | 8.1 | [8_1_BMS_Control](8_1_BMS_Control) | Reading the cell voltages of a battery pack with the bq76920 battery-monitor chip over **I2C** |
+| 8.2 | [8_2_BMS_PassiveBalancing](8_2_BMS_PassiveBalancing) | **Passive cell balancing**: detect the cells of a pack and bleed the highest ones until they match |
+| 8.3 | [8_3_BMS_Discharge](8_3_BMS_Discharge) | **Protected discharge**: start and stop a pack discharge from the PC and cut it on undervoltage or overcurrent |
 
 ## USER CODE blocks
 
@@ -57,7 +59,9 @@ STM32_F446RE/
 ├── 6_2_UART_Control_LED/        - project 6.2
 ├── 7_1_a_I2C_DS3231/            - project 7.1a
 ├── 7_2_I2C_UART/                - project 7.2
-└── 8_1_BMS_Control/             - project 8.1
+├── 8_1_BMS_Control/             - project 8.1
+├── 8_2_BMS_PassiveBalancing/    - project 8.2
+└── 8_3_BMS_Discharge/           - project 8.3
 
 # each numbered project folder follows the same internal layout:
 <project>/

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="280" viewBox="0 0 760 280" font-family="Arial, Helvetica, sans-serif" font-size="14">
+  <rect width="760" height="280" fill="#ffffff"/>
+
+  <!-- 3S pack -->
+  <rect x="20" y="60" width="150" height="150" rx="6" fill="none" stroke="#555555" stroke-width="2"/>
+  <text x="95" y="85" text-anchor="middle" font-weight="bold" fill="#555555">3S pack</text>
+  <text x="95" y="108" text-anchor="middle" fill="#555555">3 x INR18650-35E</text>
+  <text x="95" y="128" text-anchor="middle" fill="#555555">9.0 - 12.6 V</text>
+  <text x="160" y="157" text-anchor="end" fill="#c0392b">+</text>
+  <text x="160" y="197" text-anchor="end" fill="#555555">-</text>
+
+  <!-- EVM -->
+  <rect x="270" y="40" width="230" height="190" rx="6" fill="none" stroke="#2f6fed" stroke-width="2"/>
+  <text x="385" y="64" text-anchor="middle" font-weight="bold" fill="#2f6fed">bq76920EVM</text>
+  <text x="285" y="153" fill="#2f6fed">J3 BATT+</text>
+  <text x="285" y="193" fill="#2f6fed">J2 BATT-</text>
+  <text x="485" y="153" text-anchor="end" fill="#2f6fed">J7 PACK+</text>
+  <text x="485" y="193" text-anchor="end" fill="#2f6fed">J6 PACK-</text>
+  <text x="385" y="215" text-anchor="middle" font-size="12" fill="#777777">inside: DSG/CHG FETs and 1 mOhm shunt</text>
+
+  <!-- KEL103 -->
+  <rect x="590" y="60" width="150" height="150" rx="6" fill="none" stroke="#2e7d32" stroke-width="2"/>
+  <text x="665" y="85" text-anchor="middle" font-weight="bold" fill="#2e7d32">KEL103</text>
+  <text x="665" y="108" text-anchor="middle" fill="#2e7d32">DC load, mode CC</text>
+  <text x="600" y="157" fill="#c0392b">+</text>
+  <text x="600" y="197" fill="#555555">-</text>
+
+  <!-- wires -->
+  <line x1="170" y1="150" x2="270" y2="150" stroke="#c0392b" stroke-width="3"/>
+  <line x1="170" y1="190" x2="270" y2="190" stroke="#555555" stroke-width="3"/>
+  <line x1="500" y1="150" x2="590" y2="150" stroke="#c0392b" stroke-width="3"/>
+  <line x1="500" y1="190" x2="590" y2="190" stroke="#555555" stroke-width="3"/>
+
+  <text x="380" y="262" text-anchor="middle" fill="#555555">Load current flows pack - EVM - PACK jacks - KEL103. No Remote Sense wires, USB of the KEL103 not connected.</text>
+</svg>

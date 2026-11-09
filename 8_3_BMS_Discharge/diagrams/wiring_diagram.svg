@@ -1,0 +1,40 @@
+<svg width="900" height="360" viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Wiring: NUCLEO-F446RE to the J12 header of the bq76920EVM</title>
+<desc>PB8 (D15) is wired to SCL, PB9 (D14) to SDA, PB0 (A3) to ALERT and GND to GND on the left column of the J12 header of the bq76920 EVM. REGOUT is not connected. The Nucleo is powered and programmed through its own USB cable.</desc>
+<rect width="900" height="360" fill="#ffffff"/>
+
+<!-- Nucleo -->
+<rect x="30" y="60" width="300" height="250" fill="#eaf1ff" stroke="#2f6fed" stroke-width="2"/>
+<text x="180" y="88" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1a1a1a">NUCLEO-F446RE</text>
+<g font-family="sans-serif" font-size="14" fill="#1a1a1a" text-anchor="end">
+  <text x="318" y="135">PB8 (D15) · I2C1_SCL</text>
+  <text x="318" y="175">PB9 (D14) · I2C1_SDA</text>
+  <text x="318" y="215">PB0 (A3) · EXTI0</text>
+  <text x="318" y="255">GND</text>
+</g>
+<text x="180" y="335" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555555">Powered and programmed through its own ST-LINK USB cable</text>
+
+<!-- EVM -->
+<rect x="570" y="60" width="300" height="250" fill="#eaf6ea" stroke="#2e7d32" stroke-width="2"/>
+<text x="720" y="88" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#1a1a1a">bq76920EVM · J12</text>
+<text x="720" y="106" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555555">left column (chip side), 4 shunts removed</text>
+<g font-family="sans-serif" font-size="14" fill="#1a1a1a">
+  <text x="582" y="135">SCL</text>
+  <text x="582" y="175">SDA</text>
+  <text x="582" y="215">ALERT</text>
+  <text x="582" y="255">GND</text>
+  <text x="582" y="295" fill="#777777">REGOUT (2.5 V): not connected</text>
+</g>
+
+<!-- wires -->
+<line x1="330" y1="130" x2="570" y2="130" stroke="#2f6fed" stroke-width="3"/>
+<line x1="330" y1="170" x2="570" y2="170" stroke="#2f6fed" stroke-width="3"/>
+<line x1="330" y1="210" x2="570" y2="210" stroke="#2f6fed" stroke-width="3"/>
+<line x1="330" y1="250" x2="570" y2="250" stroke="#555555" stroke-width="3"/>
+<g font-family="sans-serif" font-size="12" text-anchor="middle">
+  <text x="450" y="122" fill="#2f6fed">SCL</text>
+  <text x="450" y="162" fill="#2f6fed">SDA</text>
+  <text x="450" y="202" fill="#2f6fed">ALERT</text>
+  <text x="450" y="242" fill="#555555">GND</text>
+</g>
+</svg>

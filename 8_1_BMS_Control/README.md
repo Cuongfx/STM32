@@ -76,6 +76,7 @@ Prepare the EVM before connecting anything:
 3. Do not connect `REGOUT` to the Nucleo. The EVM and the Nucleo share only `GND` and the signals.
 
 ![Pack connection: three cells in series wired to terminals C0, C1, C2 and C5, with C3 and C4 shorted to C2, and the pack ends on jacks J2 and J3](diagrams/pack_connection.svg)
+![Test bench: Nucleo-F446RE wired to the bq76920EVM, the 3S pack of three 18650 cells and the Korad KEL103 DC load](diagrams/test_setup.jpg)
 
 Connect the pack in the order shown, then **open all `S3` DIP switches**. They switch the cell-simulator resistors, which would drain real cells (the orange LED `D21` lights while they do). The chip is powered from the top cell, so no other supply is needed. Press and release `Boot` after the pack is connected. Terminal: `115200, 8N1, no flow control`.
 
@@ -146,7 +147,7 @@ Reference solution: [Core/Inc/bq76920.h](Core/Inc/bq76920.h), [Core/Src/bq76920.
 │   └── Src/
 │       ├── bq76920.c                   - wake-up, gain and offset, cell conversion
 │       └── main.c                      - init, one print per second
-├── diagrams/                           - wiring and pack-connection diagrams
+├── diagrams/                           - wiring and pack-connection diagrams, photo of the test bench
 ├── 8_1_BMS_Control.ioc                 - CubeMX project (I2C1 on PB8/PB9, USART2, PB0 EXTI)
 └── README.md
 ```
